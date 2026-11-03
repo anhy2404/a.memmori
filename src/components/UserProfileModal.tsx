@@ -47,7 +47,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   // Find target user from registered or seed accounts, fallback to safe placeholder
   const targetUser = allUsers.find((u) => u.id === userId) || {
     id: userId,
-    fullName: userId.startsWith('user_') ? 'Thành Viên Du Lịch Memmori' : userId,
+    fullName: userId.startsWith('user_') ? 'Người Dùng Memmori' : userId,
     email: 'traveler@memmori.vn',
     role: 'user' as const,
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',

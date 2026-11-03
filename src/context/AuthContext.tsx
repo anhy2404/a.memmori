@@ -20,6 +20,7 @@ interface AuthContextType {
   updateUserRole: (targetUserId: string, newRole: UserRole) => boolean;
   toggleUserStatus: (targetUserId: string) => boolean;
   deleteUserAccount: (targetUserId: string) => boolean;
+  adminUpdateUser: (targetUserId: string, updates: Partial<User>) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -401,6 +402,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return true;
   };
 
+  // Admin Update Any User Profile (Tier 1 Admin or Tier 2 f2)
+  const adminUpdateUser = (targetUserId: string, updates: Partial<User>): boolean => {
+    if (user?.role !== 'admin' && user?.role !== 'admin_f2') {
+      return false;
+    }
+    const target = allUsers.find(u => u.id === targetUserId);
+    if (!target) return false;
+
+    const updatedUser = { ...target, ...updates };
+    const updatedUsers = allUsers.map(u => u.id === targetUserId ? updatedUser : u);
+    setAllUsers(updatedUsers);
+    setItem('memmori_users_db', updatedUsers);
+
+    if (user?.id === targetUserId) {
+      setUser(updatedUser);
+      setItem('memmori_current_user', updatedUser);
+    }
+    return true;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -420,6 +441,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         updateUserRole,
         toggleUserStatus,
         deleteUserAccount,
+        adminUpdateUser,
       }}
     >
       {children}

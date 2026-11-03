@@ -168,7 +168,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
 }) => {
   const { memories } = useMemory();
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
-  const [filter, setFilter] = useState<'all' | 'unread' | 'social' | 'system'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -274,23 +273,14 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
   };
 
   const filtered = notifications.filter((n) => {
-    const matchesFilter =
-      filter === 'all'
-        ? true
-        : filter === 'unread'
-        ? !n.isRead
-        : filter === 'social'
-        ? n.type === 'like' || n.type === 'tag' || n.type === 'friend' || n.type === 'comment'
-        : n.type === 'system';
-
-    const matchesSearch =
-      !searchQuery.trim() ||
-      n.senderName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      n.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (n.targetTitle && n.targetTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (n.hashtags && n.hashtags.some((h) => h.toLowerCase().includes(searchQuery.toLowerCase())));
-
-    return matchesFilter && matchesSearch;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      n.senderName.toLowerCase().includes(q) ||
+      n.content.toLowerCase().includes(q) ||
+      (n.targetTitle && n.targetTitle.toLowerCase().includes(q)) ||
+      (n.hashtags && n.hashtags.some((h) => h.toLowerCase().includes(q)))
+    );
   });
 
   // Group notifications by date: 'Hôm nay', 'Hôm qua', 'Trước đó'
@@ -390,28 +380,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
             </button>
           )}
         </div>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none border-b border-zinc-200 dark:border-zinc-800">
-        {[
-          { id: 'all', label: `Tất cả (${notifications.length})` },
-          { id: 'unread', label: `Chưa đọc (${unreadCount})` },
-          { id: 'social', label: 'Tương tác, Tim & Bình luận' },
-          { id: 'system', label: 'Gợi ý du lịch' },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setFilter(tab.id as any)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
-              filter === tab.id
-                ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
-                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
       </div>
 
       {/* Grouped Notifications List by Date */}

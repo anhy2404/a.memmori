@@ -169,24 +169,24 @@ export const LogoMenuDrawer: React.FC<LogoMenuDrawerProps> = ({
               <ChevronRight className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 group-hover:translate-x-0.5 transition-all" />
             </div>
 
-            {user.role === 'admin' && onOpenAdminDashboard && (
+            {(user.role === 'admin' || user.role === 'admin_f2') && onOpenAdminDashboard && (
               <button
                 onClick={() => {
                   onClose();
                   onOpenAdminDashboard();
                 }}
-                className="w-full p-3 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-700 dark:text-amber-300 flex items-center justify-between text-left transition-all"
+                className="w-full p-3 rounded-2xl bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 text-violet-700 dark:text-violet-300 flex items-center justify-between text-left transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-xl bg-amber-500 text-white font-black flex items-center justify-center text-xs">
+                  <span className="w-7 h-7 rounded-xl bg-violet-600 text-white font-black flex items-center justify-center text-xs">
                     ★
                   </span>
                   <div>
-                    <div className="text-xs font-black">Trang Admin (Bộ Đếm & Ổn Định)</div>
-                    <div className="text-[10px] text-amber-600/80 dark:text-amber-400/80">Bộ đếm & giám sát các tài khoản hoạt động</div>
+                    <div className="text-xs font-black">Quản lý</div>
+                    <div className="text-[10px] text-violet-600/80 dark:text-violet-400/80">Bộ đếm & giám sát các tài khoản hoạt động ổn định</div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-amber-500" />
+                <ChevronRight className="w-4 h-4 text-violet-500" />
               </button>
             )}
           </div>
