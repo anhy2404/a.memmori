@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "Memmori - Nhật Ký Du Lịch & Kỷ Niệm",
+  "short_name": "Memmori",
+  "description": "Ứng dụng nhật ký kỷ niệm và du lịch Việt Nam thông minh tích hợp AI Gemini và bản đồ tương tác.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#09090b",
+  "theme_color": "#7c3aed",
+  "categories": ["travel", "social", "lifestyle"],
+  "icons": [
+    {
+      "src": "/assets/aistudio/logo_memmori_62cb3897.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/aistudio/logo_memmori_62cb3897.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

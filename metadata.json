@@ -1,0 +1,6 @@
+{
+  "name": "Memmori - Du Lịch & Kỷ Niệm (Bảo Mật Cấp 9)",
+  "description": "Ứng dụng nhật ký kỷ niệm và du lịch Việt Nam thông minh tích hợp AI Gemini, bản đồ tương tác, kiến trúc bảo mật Cấp 9 và cơ chế tương thích không bị chặn trên mọi thiết bị.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

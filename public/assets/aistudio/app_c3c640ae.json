@@ -1,0 +1,84 @@
+{
+  "expo": {
+    "name": "Memmori",
+    "slug": "memmori",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.memmori.app",
+      "config": {
+        "googleMapsApiKey": "AIzaSyDhGYcr2bw7OpQFgzxe3kAFG8G8MT391g8"
+      },
+      "infoPlist": {
+        "NSCameraUsageDescription": "Cần camera để chụp ảnh kỷ niệm",
+        "NSPhotoLibraryUsageDescription": "Cần thư viện ảnh để chọn ảnh",
+        "NSLocationWhenInUseUsageDescription": "Cần vị trí để gắn địa điểm",
+        "NSMicrophoneUsageDescription": "Cần microphone để quay video"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.memmori.app",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDhGYcr2bw7OpQFgzxe3kAFG8G8MT391g8"
+        }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "_comment": "Sua backendHost = IP may tinh khi Expo Go khong tu detect duoc. Sau khi sua, nhan R de reload.",
+      "backendHost": "192.168.1.4"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Cần quyền camera để chụp ảnh kỷ niệm"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Cần vị trí để gắn địa điểm cho kỷ niệm"
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Cần quyền ảnh",
+          "savePhotosPermission": "Cần lưu ảnh",
+          "isAccessMediaLocationEnabled": true
+        }
+      ],
+      "expo-secure-store",
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ]
+  }
+}
