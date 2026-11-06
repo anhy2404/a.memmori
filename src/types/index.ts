@@ -71,7 +71,7 @@ export interface Place {
   name: string;
   province: string;
   section: 'landmark' | 'food'; // 2 distinct categories: Địa Danh & Ẩm Thực
-  category: 'landmark' | 'food' | 'biendao' | 'nui' | 'disan' | 'amthuc' | 'nghiduong';
+  category: 'landmark' | 'food' | 'biendao' | 'bien' | 'nui' | 'disan' | 'amthuc' | 'nghiduong' | 'thiennhien';
   address: string; // Exact verified physical address
   region: 'Bắc' | 'Trung' | 'Nam' | 'Tây Nguyên' | 'Miền Tây';
   description: string;

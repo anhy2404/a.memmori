@@ -15,8 +15,6 @@ interface AppContextType {
   t: (key: keyof typeof translations['vi']) => string;
   viewportMode: 'mobile' | 'responsive';
   setViewportMode: (mode: 'mobile' | 'responsive') => void;
-  isSecurityModalOpen: boolean;
-  setIsSecurityModalOpen: (open: boolean) => void;
   isUnrestrictedGate: boolean;
   setIsUnrestrictedGate: (enabled: boolean) => void;
   isOnline: boolean;
@@ -32,8 +30,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [themeMode, setThemeModeState] = useState<ThemeMode>(() => getItem('memmori_theme', 'light'));
   const [accent, setAccentState] = useState<AccentId>(() => getItem('memmori_accent', 'lavender'));
   const [viewportMode, setViewportMode] = useState<'mobile' | 'responsive'>('responsive');
-  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
-  const [isUnrestrictedGate, setIsUnrestrictedGate] = useState(true); // Default true so it NEVER blocks
+  const [isUnrestrictedGate, setIsUnrestrictedGate] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [gpsStatus, setGpsStatus] = useState<'active' | 'simulated' | 'denied'>('simulated');
   
@@ -148,8 +145,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         t,
         viewportMode,
         setViewportMode,
-        isSecurityModalOpen,
-        setIsSecurityModalOpen,
         isUnrestrictedGate,
         setIsUnrestrictedGate,
         isOnline,

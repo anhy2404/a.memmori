@@ -32,7 +32,6 @@ export const SettingsScreen: React.FC<{
     language, 
     setLanguage, 
     accentPreset,
-    setIsSecurityModalOpen,
     isUnrestrictedGate,
     setIsUnrestrictedGate
   } = useApp();
@@ -79,7 +78,7 @@ export const SettingsScreen: React.FC<{
 
   const tutorialSteps = [
     { title: '1. Khám phá & Check-in', desc: 'Chọn địa điểm từ danh sách 63 tỉnh thành Việt Nam hoặc nhấn "Lấy vị trí GPS" để gắn tọa độ chính xác.' },
-    { title: '2. Sức mạnh AI Gemini', desc: 'Nhấn nút "AI Gemini Gợi Ý Caption" khi tạo kỷ niệm để nhận mô tả thơ mộng và hashtag du lịch tự động.' },
+    { title: '2. Sức mạnh Memmori', desc: 'Nhấn nút "Gợi ý lời tựa cảm xúc" khi tạo kỷ niệm để nhận câu chuyện thơ mộng và hashtag du lịch tự động.' },
     { title: '3. Bản đồ tương tác', desc: 'Mở tab Bản đồ để ngắm nhìn hành trình của bạn trải dài khắp đất nước với các pin đánh dấu sinh động.' },
     { title: '4. Tương thích 100% thiết bị', desc: 'Ứng dụng tự động tối ưu giao diện trên cả máy tính, điện thoại, máy tính bảng mượt mà.' },
     { title: '5. Bảo mật an toàn', desc: 'Mật khẩu và thông tin cá nhân được bảo vệ an toàn, riêng tư tuyệt đối.' },

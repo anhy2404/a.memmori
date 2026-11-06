@@ -23,8 +23,8 @@ import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Memory } from '../types';
 import { StoryBar } from '../components/StoryBar';
-
 import { SmartSearchBar } from '../components/SmartSearchBar';
+import { getFallbackAvatar, getFallbackPlaceImage, safeImageOnError } from '../utils/imageFallback';
 
 export const HomeScreen: React.FC<{ 
   onOpenCreate: () => void; 
@@ -34,6 +34,8 @@ export const HomeScreen: React.FC<{
   onOpenImageSearch?: () => void;
   onOpenAIChat?: () => void;
   initialSearchQuery?: string;
+  onViewOnMap?: (location: { latitude: number; longitude: number; name?: string }) => void;
+  onNavigateDiscover?: (province?: string) => void;
 }> = ({ 
   onOpenCreate, 
   onSelectMemory, 
@@ -41,7 +43,9 @@ export const HomeScreen: React.FC<{
   onOpenUserProfile,
   onOpenImageSearch = () => {},
   onOpenAIChat = () => {},
-  initialSearchQuery = '' 
+  initialSearchQuery = '',
+  onViewOnMap,
+  onNavigateDiscover
 }) => {
   const { memories, toggleLike, deleteMemory, getFilteredMemories } = useMemory();
   const { user } = useAuth();
@@ -98,7 +102,7 @@ export const HomeScreen: React.FC<{
         onSearchChange={setSearchQuery}
         onOpenImageSearch={onOpenImageSearch}
         onOpenAIChat={onOpenAIChat}
-        placeholder="Tìm kỷ niệm, địa danh (Hội An, Sa Pa, Đà Lạt...), món ăn..."
+        placeholder="Tìm địa danh, món ngon, hashtag..."
       />
 
       {/* Active Search Filter Badge */}
@@ -120,7 +124,8 @@ export const HomeScreen: React.FC<{
       {/* Quick Create Post Bar */}
       <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs flex items-center gap-3">
         <img
-          src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+          src={user?.avatar || getFallbackAvatar(user?.fullName || 'Khách')}
+          onError={(e) => safeImageOnError(e, getFallbackAvatar(user?.fullName || 'Khách'))}
           alt={user?.fullName || 'Avatar'}
           onClick={() => {
             if (user && onOpenUserProfile) onOpenUserProfile(user.id);
@@ -193,7 +198,7 @@ export const HomeScreen: React.FC<{
             Chưa có kỷ niệm nào phù hợp
           </h3>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
-            Hãy bắt đầu tạo kỷ niệm đầu tiên với ảnh đẹp, định vị danh lam thắng cảnh và AI Gemini!
+            Hãy bắt đầu tạo kỷ niệm đầu tiên với ảnh đẹp, định vị danh lam thắng cảnh và Memmori!
           </p>
           <button
             onClick={onOpenCreate}
@@ -219,7 +224,8 @@ export const HomeScreen: React.FC<{
                   <div className="flex items-center gap-3">
                     {/* Clickable Avatar -> Opens User Profile Modal */}
                     <img
-                      src={mem.userAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                      src={mem.userAvatar || getFallbackAvatar(mem.userFullName)}
+                      onError={(e) => safeImageOnError(e, getFallbackAvatar(mem.userFullName))}
                       alt={mem.userFullName}
                       onClick={() => {
                         if (onOpenUserProfile) onOpenUserProfile(mem.userId);
@@ -285,6 +291,7 @@ export const HomeScreen: React.FC<{
                       >
                         <img
                           src={photo}
+                          onError={(e) => safeImageOnError(e, getFallbackPlaceImage(mem.title))}
                           alt={mem.title}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           loading="lazy"
@@ -307,10 +314,46 @@ export const HomeScreen: React.FC<{
                       {mem.title}
                     </h3>
 
-                    {/* Location Badge */}
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400">
-                      <MapPin className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">{mem.location.name}</span>
+                    {/* Location Badge & Cross-Flow Links */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400">
+                        <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                        <span className="truncate">{mem.location.name}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        {onViewOnMap && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onViewOnMap({
+                                latitude: mem.location.latitude,
+                                longitude: mem.location.longitude,
+                                name: mem.location.name,
+                              });
+                            }}
+                            className="text-[11px] font-bold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/40 hover:bg-violet-100 dark:hover:bg-violet-900/60 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                            title="Xem vị trí bài đăng này trên bản đồ"
+                          >
+                            <span>📍 Bản đồ</span>
+                          </button>
+                        )}
+                        {onNavigateDiscover && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const matchedTag = mem.tags?.find(t => t.startsWith('#'))?.replace('#', '') || '';
+                              onNavigateDiscover(matchedTag);
+                            }}
+                            className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                            title="Khám phá các địa danh & ẩm thực lân cận"
+                          >
+                            <span>🧭 Khám phá</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 

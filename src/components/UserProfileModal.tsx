@@ -19,6 +19,7 @@ import { User, Memory } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useMemory } from '../context/MemoryContext';
 import { useApp } from '../context/AppContext';
+import { getFallbackAvatar, getFallbackPlaceImage, safeImageOnError } from '../utils/imageFallback';
 
 interface UserProfileModalProps {
   userId: string | null;
@@ -115,7 +116,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             {/* Avatar */}
             <div className="relative group shrink-0 self-center sm:self-start">
               <img
-                src={targetUser.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                src={targetUser.avatar || getFallbackAvatar(targetUser.fullName, targetUser.role)}
+                onError={(e) => safeImageOnError(e, getFallbackAvatar(targetUser.fullName, targetUser.role))}
                 alt={targetUser.fullName}
                 onClick={() => setIsAvatarZoomed(true)}
                 className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white dark:border-zinc-900 shadow-xl cursor-pointer hover:opacity-95 transition-all"
@@ -271,7 +273,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer bg-zinc-100 dark:bg-zinc-800 shadow-sm"
                 >
                   <img
-                    src={mem.photos[0] || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80'}
+                    src={mem.photos[0] || getFallbackPlaceImage(mem.title)}
+                    onError={(e) => safeImageOnError(e, getFallbackPlaceImage(mem.title))}
                     alt={mem.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -294,7 +297,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   className="p-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-3.5 cursor-pointer hover:border-violet-500/50 transition-all shadow-xs"
                 >
                   <img
-                    src={mem.photos[0] || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=400&q=80'}
+                    src={mem.photos[0] || getFallbackPlaceImage(mem.title)}
+                    onError={(e) => safeImageOnError(e, getFallbackPlaceImage(mem.title))}
                     alt={mem.title}
                     className="w-16 h-16 rounded-xl object-cover shrink-0"
                   />
@@ -329,7 +333,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               <X className="w-6 h-6" />
             </button>
             <img
-              src={targetUser.avatar}
+              src={targetUser.avatar || getFallbackAvatar(targetUser.fullName, targetUser.role)}
+              onError={(e) => safeImageOnError(e, getFallbackAvatar(targetUser.fullName, targetUser.role))}
               alt={targetUser.fullName}
               className="max-w-xs sm:max-w-md w-full aspect-square rounded-3xl object-cover shadow-2xl border-2 border-white/20"
             />

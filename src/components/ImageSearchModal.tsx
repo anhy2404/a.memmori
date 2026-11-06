@@ -184,7 +184,7 @@ export const ImageSearchModal: React.FC<ImageSearchModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-extrabold text-zinc-900 dark:text-white">
-                Tìm Kiếm Bằng Hình Ảnh (AI Visual)
+                Tìm Kiếm Bằng Hình Ảnh (Memmori)
               </h3>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Nhận diện địa danh, món ăn và định vị trên bản đồ Việt Nam
@@ -256,7 +256,7 @@ export const ImageSearchModal: React.FC<ImageSearchModalProps> = ({
             <div className="p-6 rounded-2xl bg-violet-50/70 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800 text-center space-y-3 animate-pulse">
               <Loader2 className="w-8 h-8 text-violet-600 dark:text-violet-400 animate-spin mx-auto" />
               <p className="text-sm font-bold text-violet-800 dark:text-violet-200">
-                AI đang quét và phân tích tọa độ địa danh...
+                Memmori đang quét và phân tích tọa độ địa danh...
               </p>
               <p className="text-xs text-violet-600 dark:text-violet-400">
                 Đối chiếu dữ liệu ảnh thực tế với 63 tỉnh thành Việt Nam

@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { LogoMenuDrawer } from './LogoMenuDrawer';
 import { TabScreen } from './BottomTabBar';
+import { getFallbackAvatar, safeImageOnError } from '../utils/imageFallback';
 
 interface NavbarProps {
   onOpenAuth: () => void;
@@ -57,37 +58,37 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="w-10 h-10 rounded-2xl object-cover shadow-sm border border-zinc-200 dark:border-zinc-700 group-hover:scale-105 transition-transform"
             />
 
-            <div className="flex flex-col">
-              <span className="font-black text-xl tracking-tight bg-gradient-to-r from-violet-600 via-pink-500 to-amber-500 bg-clip-text text-transparent">
+            <div className="flex flex-col min-w-0">
+              <span className="font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-violet-600 via-pink-500 to-amber-500 bg-clip-text text-transparent leading-none">
                 Memmori
               </span>
-              <p className="text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 font-medium line-clamp-1">
+              <p className="text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 font-medium truncate mt-0.5">
                 Nhật ký du lịch Việt Nam
               </p>
             </div>
           </button>
 
-          {/* RIGHT: Chuông thông báo & Nút ba vạch (chưa đăng nhập hiện Đăng nhập, đã đăng nhập hiện Tài khoản) */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* RIGHT: Chuông thông báo, Hồ sơ người dùng & Nút Đăng Xuất (Icon-only) */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             
-            {/* Chuông Thông Báo (Bell with Red Unread Dot như trong ảnh) */}
+            {/* Chuông Thông Báo */}
             <button
               onClick={onOpenNotifications}
-              className="p-2.5 rounded-xl text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors relative active:scale-95 focus:outline-none"
+              className="p-2 sm:p-2.5 rounded-xl text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors relative active:scale-95 focus:outline-none cursor-pointer"
               title="Thông báo mới"
               aria-label="Thông báo"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
-                <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-zinc-900 animate-pulse" />
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-zinc-900 animate-pulse" />
               )}
             </button>
 
-            {/* Nút Đăng nhập: Hiển thị rõ chữ 'Đăng nhập' trên mọi thiết bị khi chưa đăng nhập. Khi đã đăng nhập thì hiện Tài khoản */}
+            {/* Chưa đăng nhập: Hiện nút Đăng nhập */}
             {!isAuthenticated || !user ? (
               <button
                 onClick={onOpenAuth}
-                className="flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white transition-all active:scale-95 shadow-sm focus:outline-none"
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white transition-all active:scale-95 shadow-sm focus:outline-none cursor-pointer"
                 title="Đăng nhập tài khoản"
                 aria-label="Đăng nhập"
               >
@@ -96,6 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             ) : (
               <div className="flex items-center gap-1.5 sm:gap-2">
+                {/* Hồ sơ tài khoản người dùng */}
                 <button
                   onClick={() => onNavigateTab('profile')}
                   className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition-all active:scale-95 focus:outline-none cursor-pointer"
@@ -103,24 +105,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                   aria-label="Hồ sơ tài khoản"
                 >
                   <img
-                    src={user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                    src={user.avatar || getFallbackAvatar(user.fullName, user.role)}
+                    onError={(e) => safeImageOnError(e, getFallbackAvatar(user.fullName, user.role))}
                     alt={user.fullName}
                     className="w-7 h-7 rounded-full object-cover border-2 border-violet-500/60 shadow-xs"
                   />
-                  <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 max-w-[80px] sm:max-w-[120px] truncate">
+                  <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 max-w-[70px] sm:max-w-[100px] truncate hidden xs:inline">
                     {user.fullName.split(' ')[0]}
                   </span>
                 </button>
 
-                {/* Nút Đăng Xuất Dễ Nhìn Thấy */}
+                {/* Nút Đăng Xuất (Chỉ để lại ký tự biểu tượng, không để chữ theo yêu cầu) */}
                 <button
                   onClick={logout}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50 transition-all active:scale-95 text-xs font-bold shadow-xs cursor-pointer"
+                  className="p-2 sm:p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50 transition-all active:scale-95 shadow-xs cursor-pointer flex items-center justify-center"
                   title="Đăng xuất tài khoản"
                   aria-label="Đăng xuất"
                 >
-                  <LogOut className="w-3.5 h-3.5 text-rose-500" />
-                  <span className="hidden sm:inline">Đăng xuất</span>
+                  <LogOut className="w-4 h-4 text-rose-500" />
                 </button>
               </div>
             )}

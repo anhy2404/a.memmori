@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Memmori - Du Lịch & Nhật Ký Kỷ Niệm Việt Nam</title>
-    <meta name="description" content="Ứng dụng nhật ký kỷ niệm và du lịch Việt Nam thông minh tích hợp AI Gemini, bản đồ tương tác, tìm kiếm bằng giọng nói và hình ảnh." />
+    <meta name="description" content="Ứng dụng nhật ký du lịch và ẩm thực 63 tỉnh thành Việt Nam với bản đồ tương tác, tìm kiếm thông minh và lưu giữ khoảnh khắc thanh xuân." />
     <meta property="og:title" content="Memmori - Du Lịch & Nhật Ký Kỷ Niệm Việt Nam" />
-    <meta property="og:description" content="Ứng dụng nhật ký kỷ niệm và du lịch Việt Nam thông minh tích hợp AI Gemini, bản đồ tương tác, tìm kiếm bằng giọng nói và hình ảnh." />
+    <meta property="og:description" content="Ứng dụng nhật ký du lịch và ẩm thực 63 tỉnh thành Việt Nam với bản đồ tương tác, tìm kiếm thông minh và lưu giữ khoảnh khắc thanh xuân." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#7c3aed" />
@@ -23,6 +23,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
       (function() {
+        // Suppress benign preview iframe WebSocket / HMR disconnect warnings
+        window.addEventListener('error', function(e) {
+          if (e && e.message && (e.message.indexOf('WebSocket') !== -1 || e.message.indexOf('websocket') !== -1)) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            return true;
+          }
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+          if (e && e.reason && String(e.reason).indexOf('WebSocket') !== -1) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+          }
+        });
+
         try {
           var t = localStorage.getItem('memmori_theme');
           var isDark = t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);

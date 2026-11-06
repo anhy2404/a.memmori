@@ -1,64 +1,87 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Camera, Upload, MapPin, X, Sparkles, Check } from 'lucide-react';
 import { StoryItem, StoryViewerModal } from './StoryViewerModal';
 import { CameraCaptureModal } from './CameraCaptureModal';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
-
+import { getFallbackAvatar, getFallbackPlaceImage, safeImageOnError } from '../utils/imageFallback';
 const INITIAL_STORIES: StoryItem[] = [
+  {
+    id: 'story_hagiang',
+    userId: 'user_admin_01',
+    userFullName: 'Hoàng Yến (Admin)',
+    userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    photo: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    soundEffect: 'mountain_wind',
+    caption: 'Đứng trên đỉnh Mã Pí Lèng nhìn xuống dòng Nho Quế xanh biếc say đắm lòng người! ⛰️🌊',
+    location: 'Hẻm Tu Sản, Hà Giang',
+    timeAgo: '1 giờ trước',
+    isHighlight: true,
+  },
+  {
+    id: 'story_ninhbinh',
+    userId: 'user_demo_02',
+    userFullName: 'Emily Demo',
+    userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    photo: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    soundEffect: 'stream',
+    caption: 'Ngắm trọn Tam Cốc từ đỉnh Hang Múa, đất trời Ninh Bình đẹp ngỡ ngàng! 🐉🍃',
+    location: 'Hang Múa, Ninh Bình',
+    timeAgo: '3 giờ trước',
+    isHighlight: true,
+  },
   {
     id: 'story_hoian',
     userId: 'user_admin_01',
     userFullName: 'Hoàng Yến (Admin)',
     userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     photo: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+    soundEffect: 'temple_bell',
     caption: 'Đêm phố cổ Hội An thả đèn hoa đăng lung linh cầu chúc bình an! ✨🏮',
     location: 'Phố cổ Hội An, Quảng Nam',
-    timeAgo: '2 giờ trước',
+    timeAgo: '4 giờ trước',
     isHighlight: true,
   },
   {
     id: 'story_dalat',
     userId: 'user_demo_02',
-    userFullName: 'Người Dùng Demo',
+    userFullName: 'Emily Demo',
     userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    photo: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+    photo: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    soundEffect: 'mountain_wind',
     caption: 'Săn mây bình minh 5 giờ sáng tại đồi chè Cầu Đất Đà Lạt, không khí se lạnh cực chill! ☁️🌲',
     location: 'Cầu Đất, Đà Lạt, Lâm Đồng',
-    timeAgo: '4 giờ trước',
+    timeAgo: '5 giờ trước',
     isHighlight: true,
   },
   {
     id: 'story_sapa',
     userId: 'user_anhy_03',
-    userFullName: 'Nguyễn Anh Tuấn',
+    userFullName: 'Tuấn Anh',
     userAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-    photo: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80',
+    photo: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    soundEffect: 'mountain_wind',
     caption: 'Mùa vàng trên ruộng bậc thang Mường Hoa, vẻ đẹp hùng vĩ Tây Bắc! 🌾🏔️',
     location: 'Thung lũng Mường Hoa, Sa Pa',
     timeAgo: '6 giờ trước',
     isHighlight: true,
   },
   {
-    id: 'story_halong',
-    userId: 'user_admin_01',
-    userFullName: 'Hoàng Yến (Admin)',
-    userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    photo: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
-    caption: 'Chèo thuyền kayak giữa muôn trùng non nước Vịnh Hạ Long di sản! 🛶🌊',
-    location: 'Vịnh Hạ Long, Quảng Ninh',
-    timeAgo: 'Hôm qua',
-    isHighlight: false,
-  },
-  {
     id: 'story_phuquoc',
     userId: 'user_demo_02',
-    userFullName: 'Người Dùng Demo',
+    userFullName: 'Emily Demo',
     userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
     photo: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+    soundEffect: 'ocean',
     caption: 'Biển Bãi Sao Phú Quốc nước trong vắt cát trắng mịn như kem! 🏝️🍹',
     location: 'Bãi Sao, Phú Quốc, Kiên Giang',
-    timeAgo: '2 ngày trước',
+    timeAgo: 'Hôm qua',
     isHighlight: true,
   },
 ];
@@ -68,11 +91,34 @@ interface StoryBarProps {
 }
 
 export const StoryBar: React.FC<StoryBarProps> = ({ onOpenUserProfile }) => {
-  const { user } = useAuth();
+  const { user, allUsers } = useAuth();
   const { accentPreset } = useApp();
 
   const [stories, setStories] = useState<StoryItem[]>(INITIAL_STORIES);
   const [activeStoryIdx, setActiveStoryIdx] = useState<number | null>(null);
+
+  // Sync story user avatars and names with updated accounts in allUsers
+  useEffect(() => {
+    if (allUsers.length > 0) {
+      setStories((prev) =>
+        prev.map((s) => {
+          const matched = allUsers.find((u) => u.id === s.userId);
+          if (
+            matched &&
+            matched.avatar &&
+            (matched.avatar !== s.userAvatar || matched.fullName !== s.userFullName)
+          ) {
+            return {
+              ...s,
+              userAvatar: matched.avatar,
+              userFullName: matched.fullName || s.userFullName,
+            };
+          }
+          return s;
+        })
+      );
+    }
+  }, [allUsers]);
 
   // Add Story modal states
   const [isAddStoryOpen, setIsAddStoryOpen] = useState(false);
@@ -138,10 +184,8 @@ export const StoryBar: React.FC<StoryBarProps> = ({ onOpenUserProfile }) => {
         >
           <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-full border-2 border-dashed border-violet-400 dark:border-violet-600 p-0.5 group-hover:scale-105 transition-transform bg-violet-50 dark:bg-violet-950/30 flex items-center justify-center overflow-hidden">
             <img
-              src={
-                user?.avatar ||
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'
-              }
+              src={user?.avatar || getFallbackAvatar(user?.fullName || 'Người dùng')}
+              onError={(e) => safeImageOnError(e, getFallbackAvatar(user?.fullName || 'Người dùng'))}
               alt="Thêm tin"
               className="w-full h-full rounded-full object-cover opacity-80"
             />
@@ -167,14 +211,15 @@ export const StoryBar: React.FC<StoryBarProps> = ({ onOpenUserProfile }) => {
             className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
           >
             <div
-              className="w-16 h-16 sm:w-18 sm:h-18 rounded-full p-0.5 border-2 transition-transform group-hover:scale-105 shadow-xs"
+              className="w-16 h-16 sm:w-18 sm:h-18 rounded-full p-0.5 border-2 transition-transform group-hover:scale-105 shadow-xs overflow-hidden"
               style={{
                 borderColor: story.isHighlight ? '#f59e0b' : accentPreset.primary,
               }}
             >
               <img
-                src={story.photo}
-                alt={story.caption}
+                src={story.userAvatar || getFallbackAvatar(story.userFullName)}
+                onError={(e) => safeImageOnError(e, getFallbackAvatar(story.userFullName))}
+                alt={story.userFullName}
                 className="w-full h-full rounded-full object-cover"
               />
             </div>

@@ -14,19 +14,38 @@ import {
   Maximize2,
   MessageCircle,
   Send,
-  CornerDownRight
+  CornerDownRight,
+  Compass,
+  Plus,
+  Sparkles,
+  ExternalLink,
+  Utensils,
+  Landmark
 } from 'lucide-react';
-import { Memory } from '../types';
+import { Memory, Place } from '../types';
 import { useMemory } from '../context/MemoryContext';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
+import { VIETNAM_PLACES } from '../data/vietnamPlaces';
+import { getFallbackAvatar, getFallbackPlaceImage, safeImageOnError } from '../utils/imageFallback';
 
 export const MemoryDetailModal: React.FC<{
   memory: Memory | null;
   onClose: () => void;
   onOpenUserProfile?: (userId: string) => void;
   onSearchHashtag?: (hashtag: string) => void;
-}> = ({ memory, onClose, onOpenUserProfile, onSearchHashtag }) => {
+  onViewOnMap?: (location: { latitude: number; longitude: number; name?: string }) => void;
+  onNavigateDiscover?: (province?: string) => void;
+  onOpenCreateWithPlace?: (place: Place) => void;
+}> = ({ 
+  memory, 
+  onClose, 
+  onOpenUserProfile, 
+  onSearchHashtag,
+  onViewOnMap,
+  onNavigateDiscover,
+  onOpenCreateWithPlace
+}) => {
   const { toggleLike, deleteMemory, updateMemory } = useMemory();
   const { user } = useAuth();
   const { accentPreset } = useApp();
@@ -66,6 +85,33 @@ export const MemoryDetailModal: React.FC<{
   ]);
   const [newCommentText, setNewCommentText] = useState('');
 
+  // Find matched province from memory's location name, address or tags
+  const matchedProvince = React.useMemo(() => {
+    if (!memory) return 'Hà Nội';
+    const combined = `${memory.location.name} ${memory.location.address || ''} ${(memory.tags || []).join(' ')}`.toLowerCase();
+    for (const place of VIETNAM_PLACES) {
+      if (combined.includes(place.province.toLowerCase())) {
+        return place.province;
+      }
+    }
+    let closest = VIETNAM_PLACES[0];
+    let minD = Number.MAX_VALUE;
+    VIETNAM_PLACES.forEach(p => {
+      const d = Math.pow(p.latitude - memory.location.latitude, 2) + Math.pow(p.longitude - memory.location.longitude, 2);
+      if (d < minD) {
+        minD = d;
+        closest = p;
+      }
+    });
+    return closest.province;
+  }, [memory]);
+
+  const relatedSuggestions = React.useMemo(() => {
+    const landmarks = VIETNAM_PLACES.filter(p => p.province === matchedProvince && p.section === 'landmark');
+    const foods = VIETNAM_PLACES.filter(p => p.province === matchedProvince && p.section === 'food');
+    return [landmarks[0], foods[0]].filter(Boolean);
+  }, [matchedProvince]);
+
   if (!memory) return null;
 
   const isOwner = user && user.id === memory.userId;
@@ -89,7 +135,7 @@ export const MemoryDetailModal: React.FC<{
       userFullName: user?.fullName || 'Khách Du Lịch',
       userAvatar:
         user?.avatar ||
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+        getFallbackAvatar(user?.fullName || 'Khách'),
       text: newCommentText.trim(),
       timeAgo: 'Vừa xong',
     };
@@ -113,7 +159,8 @@ export const MemoryDetailModal: React.FC<{
           <div className="flex items-center gap-3">
             {/* Clickable Avatar -> Opens User Profile */}
             <img
-              src={memory.userAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+              src={memory.userAvatar || getFallbackAvatar(memory.userFullName)}
+              onError={(e) => safeImageOnError(e, getFallbackAvatar(memory.userFullName))}
               alt={memory.userFullName}
               onClick={() => {
                 if (onOpenUserProfile) onOpenUserProfile(memory.userId);
@@ -191,6 +238,7 @@ export const MemoryDetailModal: React.FC<{
             <div className="relative rounded-2xl overflow-hidden bg-zinc-950 aspect-video flex items-center justify-center">
               <img
                 src={memory.photos[activePhotoIdx]}
+                onError={(e) => safeImageOnError(e, getFallbackPlaceImage(memory.title))}
                 alt={memory.title}
                 className="w-full h-full object-cover"
               />
@@ -269,7 +317,7 @@ export const MemoryDetailModal: React.FC<{
 
               {/* Location Badge */}
               <div className="flex items-center gap-1.5 text-xs font-bold text-violet-600 dark:text-violet-400">
-                <MapPin className="w-4 h-4 shrink-0" />
+                <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
                 <span>{memory.location.name}</span>
                 <span className="text-[11px] text-zinc-400 font-normal">
                   ({memory.location.latitude.toFixed(4)}, {memory.location.longitude.toFixed(4)})
@@ -300,6 +348,155 @@ export const MemoryDetailModal: React.FC<{
                   ))}
                 </div>
               )}
+
+              {/* Interactive Flow Bar: Bản đồ ⇄ Khám phá ⇄ Tạo mới */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+                {onViewOnMap && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onViewOnMap({
+                        latitude: memory.location.latitude,
+                        longitude: memory.location.longitude,
+                        name: memory.location.name,
+                      });
+                      onClose();
+                    }}
+                    className="py-2.5 px-3 rounded-2xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/40 dark:hover:bg-violet-900/50 text-violet-700 dark:text-violet-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer"
+                  >
+                    <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
+                    <span>Xem Trên Bản Đồ</span>
+                  </button>
+                )}
+
+                {onNavigateDiscover && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onNavigateDiscover(matchedProvince);
+                      onClose();
+                    }}
+                    className="py-2.5 px-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer"
+                  >
+                    <Compass className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span>Khám Phá {matchedProvince}</span>
+                  </button>
+                )}
+
+                {onOpenCreateWithPlace && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const placeObj: Place = {
+                        id: `custom_${Date.now()}`,
+                        name: memory.location.name,
+                        province: matchedProvince,
+                        section: 'landmark',
+                        category: 'disan',
+                        address: memory.location.address || memory.location.name,
+                        region: 'Trung',
+                        description: memory.description,
+                        image: memory.photos?.[0] || getFallbackPlaceImage(memory.title),
+                        latitude: memory.location.latitude,
+                        longitude: memory.location.longitude,
+                        rating: 4.9,
+                        bestTime: 'Quanh năm',
+                        highlightTag: 'Điểm Check-in',
+                      };
+                      onOpenCreateWithPlace(placeObj);
+                      onClose();
+                    }}
+                    className="py-2.5 px-3 rounded-2xl text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs hover:opacity-95 active:scale-95 cursor-pointer"
+                    style={{ backgroundColor: accentPreset.primary }}
+                  >
+                    <Plus className="w-4 h-4 shrink-0" />
+                    <span>Tạo Kỷ Niệm Nơi Này</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Gợi ý điểm đến & Món ngon lân cận */}
+              {relatedSuggestions.length > 0 && (
+                <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-extrabold text-zinc-900 dark:text-white uppercase tracking-wider">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Gợi ý lân cận tại {matchedProvince}:</span>
+                    </div>
+                    {onNavigateDiscover && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onNavigateDiscover(matchedProvince);
+                          onClose();
+                        }}
+                        className="text-[11px] font-bold text-violet-600 dark:text-violet-400 hover:underline cursor-pointer"
+                      >
+                        Khám phá thêm →
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {relatedSuggestions.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-2.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 flex items-center gap-2.5 hover:border-violet-500/50 transition-all shadow-xs"
+                      >
+                        <img
+                          src={item.image}
+                          onError={(e) => safeImageOnError(e, getFallbackPlaceImage(item.name, item.section === 'food'))}
+                          alt={item.name}
+                          className="w-14 h-14 rounded-xl object-cover shrink-0"
+                        />
+                        <div className="flex-1 min-w-0 space-y-0.5">
+                          <div className="flex items-center gap-1 text-[10px] font-bold">
+                            <span className={item.section === 'food' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}>
+                              {item.section === 'food' ? '🍲 Ẩm Thực' : '🏛️ Địa Danh'}
+                            </span>
+                            <span className="text-zinc-400">• ★ {item.rating}</span>
+                          </div>
+                          <h5 className="text-xs font-extrabold text-zinc-900 dark:text-white line-clamp-1">
+                            {item.name}
+                          </h5>
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400 line-clamp-1">
+                            {item.address}
+                          </p>
+                          <div className="flex items-center gap-2 pt-0.5">
+                            {onViewOnMap && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onViewOnMap({ latitude: item.latitude, longitude: item.longitude, name: item.name });
+                                  onClose();
+                                }}
+                                className="text-[10px] font-bold text-violet-600 dark:text-violet-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+                              >
+                                <MapPin className="w-3 h-3 text-red-500" />
+                                <span>Bản đồ</span>
+                              </button>
+                            )}
+                            {onOpenCreateWithPlace && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onOpenCreateWithPlace(item);
+                                  onClose();
+                                }}
+                                className="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 hover:text-violet-600 flex items-center gap-0.5 cursor-pointer"
+                              >
+                                <Plus className="w-3 h-3" />
+                                <span>Check-in</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
 
@@ -315,7 +512,8 @@ export const MemoryDetailModal: React.FC<{
               {comments.map((c) => (
                 <div key={c.id} className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 flex items-start gap-2.5">
                   <img
-                    src={c.userAvatar}
+                    src={c.userAvatar || getFallbackAvatar(c.userFullName)}
+                    onError={(e) => safeImageOnError(e, getFallbackAvatar(c.userFullName))}
                     alt={c.userFullName}
                     onClick={() => {
                       if (onOpenUserProfile) onOpenUserProfile(c.userId);

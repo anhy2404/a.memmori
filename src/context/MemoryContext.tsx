@@ -20,18 +20,42 @@ interface MemoryContextType {
 
 const MemoryContext = createContext<MemoryContextType | undefined>(undefined);
 
-// Rich Initial Sample Memories across Vietnam
+// Rich Initial Sample Memories across Vietnam - Curated by 10-Year Travel & Editorial Experts
 const SEED_MEMORIES: Memory[] = [
+  {
+    id: 'mem_hagiang_01',
+    userId: 'user_admin_01',
+    userFullName: 'Hoàng Yến (Admin)',
+    userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    title: 'Chạm mây Mã Pí Lèng & lướt thuyền ngọc bích hẻm Tu Sản',
+    description: 'Đứng trên đỉnh Mã Pí Lèng nhìn xuống dòng sông Nho Quế như dải lụa xanh biếc vắt ngang qua hẻm Tu Sản sâu nhất Đông Nam Á. Gió cao nguyên đá thổi phần phật vào ngực áo, thấy giang sơn gấm vóc hùng vĩ đến nghẹn ngào. Đêm về phố cổ Đồng Văn sưởi bếp lửa, thưởng thức bát cháo ấu tẩu bùi ngậy và chén rượu ngô men lá thơm lừng.',
+    photos: [
+      'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85',
+    ],
+    location: {
+      name: 'Hẻm Tu Sản, Đèo Mã Pí Lèng, Hà Giang',
+      address: 'Pải Lủng, Mèo Vạc, Hà Giang',
+      latitude: 23.238914,
+      longitude: 105.418231,
+    },
+    tags: ['#HaGiang', '#MaPiLeng', '#HemTuSan', '#NhoQue', '#DongVan', '#PhuotTayBac'],
+    taggedUsers: ['demo@memmori.vn'],
+    privacy: 'public',
+    likesCount: 68,
+    isLiked: true,
+    createdAt: '2026-11-02T08:15:00Z',
+  },
   {
     id: 'mem_hoian_01',
     userId: 'user_admin_01',
     userFullName: 'Hoàng Yến (Admin)',
     userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     title: 'Đêm hoa đăng lung linh bên dòng sông Hoài',
-    description: 'Phố cổ Hội An về đêm đẹp tựa một bức tranh thủy mặc. Từng chiếc đèn hoa đăng trôi lững lờ mang theo bao ước nguyện bình an. Thưởng thức cao lầu và nghe tiếng đàn trầm ấm ven bờ sông.',
+    description: 'Phố cổ Hội An về đêm đẹp tựa một bức tranh thủy mặc. Từng chiếc đèn hoa đăng trôi lững lờ mang theo bao ước nguyện bình an. Thưởng thức cao lầu Thanh đậm vị truyền thống và lắng nghe tiếng đàn trầm ấm ven bờ sông Hoài.',
     photos: [
-      'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1000&q=80',
-      'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=85',
     ],
     location: {
       name: 'Phố cổ Hội An, Quảng Nam',
@@ -42,20 +66,44 @@ const SEED_MEMORIES: Memory[] = [
     tags: ['#HoiAn', '#PhoCo', '#HoaDang', '#DuLichMienTrung', '#VietnamTravel'],
     taggedUsers: ['demo@memmori.vn'],
     privacy: 'public',
-    likesCount: 42,
+    likesCount: 54,
     isLiked: true,
     createdAt: '2026-10-28T19:30:00Z',
+  },
+  {
+    id: 'mem_ninhbinh_02',
+    userId: 'user_demo_02',
+    userFullName: 'Emily Demo',
+    userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    title: 'Thả thuyền chốn bồng lai Tràng An & vượt 500 bậc Hang Múa',
+    description: 'Chiếc thuyền nan rẽ nước êm đềm luồn qua Hang Tối, Hang Sáng; nước trong vắt nhìn thấu từng thảm rong đuôi chồn rập rờn dưới đáy. Leo 500 bậc đá lên đỉnh Ngọa Long ngắm trọn khúc sông Ngô Đồng uốn lượn giữa những dãy núi đá vôi triệu năm. Bữa trưa ăn cơm cháy giòn rụm chấm nước sốt dê núi thơm cay nồng ấm.',
+    photos: [
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1599818817296-6e3a9c7b9492?auto=format&fit=crop&w=1200&q=85',
+    ],
+    location: {
+      name: 'Quần thể Danh thắng Tràng An, Ninh Bình',
+      address: 'Tràng An, Ninh Xuân, Hoa Lư, Ninh Bình',
+      latitude: 20.250614,
+      longitude: 105.904231,
+    },
+    tags: ['#NinhBinh', '#TrangAn', '#HangMua', '#DiSanUNESCO', '#CheckinVN'],
+    taggedUsers: [],
+    privacy: 'public',
+    likesCount: 47,
+    isLiked: true,
+    createdAt: '2026-10-26T10:40:00Z',
   },
   {
     id: 'mem_dalat_02',
     userId: 'user_admin_01',
     userFullName: 'Hoàng Yến (Admin)',
     userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    title: 'Săn mây sớm tại đỉnh Cầu Đất Đà Lạt',
-    description: 'Thức dậy từ 4h30 sáng trong cái lạnh 14 độ của Đà Lạt. Biển mây bồng bềnh cuồn cuộn dưới thung lũng chè xanh mướt. Một ly cà phê nóng giữa mây trời là khoảnh khắc khó quên nhất!',
+    title: 'Săn mây sớm tại đồi chè Cầu Đất Đà Lạt',
+    description: 'Thức dậy từ 4h30 sáng trong cái lạnh 14 độ của xứ thông reo. Biển mây bồng bềnh cuồn cuộn dưới thung lũng chè xanh mướt. Một ly cà phê nóng giữa mây trời sương giăng là khoảnh khắc thanh xuân rực rỡ khó quên nhất!',
     photos: [
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80',
-      'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=85',
     ],
     location: {
       name: 'Đồi chè Cầu Đất, Đà Lạt, Lâm Đồng',
@@ -63,22 +111,46 @@ const SEED_MEMORIES: Memory[] = [
       latitude: 11.906478,
       longitude: 108.544832,
     },
-    tags: ['#DaLat', '#SanMay', '#CauDat', '#TayNguyen', '#CaPhe'],
+    tags: ['#DaLat', '#SanMay', '#CauDat', '#TayNguyen', '#CaPheLanh'],
     taggedUsers: [],
     privacy: 'public',
-    likesCount: 38,
+    likesCount: 42,
     isLiked: false,
     createdAt: '2026-10-25T06:15:00Z',
   },
   {
+    id: 'mem_hue_03',
+    userId: 'user_anhy_03',
+    userFullName: 'Tuấn Anh',
+    userAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    title: 'Hương trầm Hoàng thành Huế & vị cay nồng bún bò Mụ Rơi',
+    description: 'Sớm mai sương giăng trên Ngọ Môn và điện Thái Hòa, nét rêu phong trầm mặc đọng lại trên từng đường nét cung đình. Hoàng hôn buông, nghe nhã nhạc cung đình vang vọng trên dòng sông Hương bảng lảng khói chiều. Buổi tối tạt vào gánh bún bò mụ Rơi húp xì xụp bát bún thơm mùi sả ruốc đậm đà.',
+    photos: [
+      'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=85',
+    ],
+    location: {
+      name: 'Đại Nội Huế, Thừa Thiên Huế',
+      address: 'Đường 23/8, Thuận Hòa, Thành phố Huế, Thừa Thiên Huế',
+      latitude: 16.469722,
+      longitude: 107.579611,
+    },
+    tags: ['#Hue', '#DaiNoi', '#SongHuong', '#BunBoHue', '#CoDoHue'],
+    taggedUsers: ['hoangyen24042004@gmail.com'],
+    privacy: 'public',
+    likesCount: 39,
+    isLiked: false,
+    createdAt: '2026-10-22T15:20:00Z',
+  },
+  {
     id: 'mem_sapa_03',
     userId: 'user_demo_02',
-    userFullName: 'Người Dùng Demo',
+    userFullName: 'Emily Demo',
     userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
     title: 'Ruộng bậc thang vàng rực thung lũng Mường Hoa',
-    description: 'Mùa lúa chín Sa Pa đẹp nao lòng người. Từng bậc thang vàng óng ả uốn lượn men theo sườn núi Tây Bắc, hòa cùng nụ cười hồn nhiên của các em nhỏ vùng cao.',
+    description: 'Mùa lúa chín Sa Pa đẹp nao lòng người. Từng bậc thang vàng óng ả uốn lượn men theo sườn núi Tây Bắc, hòa cùng nụ cười hồn nhiên của các em nhỏ vùng cao bên dòng suối Hoa róc rách đêm ngày.',
     photos: [
-      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=85',
     ],
     location: {
       name: 'Thung lũng Mường Hoa, Sa Pa, Lào Cai',
@@ -89,74 +161,149 @@ const SEED_MEMORIES: Memory[] = [
     tags: ['#SaPa', '#MuongHoa', '#LuaChin', '#TayBac', '#RuongBacThang'],
     taggedUsers: ['hoangyen24042004@gmail.com'],
     privacy: 'public',
-    likesCount: 29,
+    likesCount: 35,
     isLiked: true,
     createdAt: '2026-10-18T14:20:00Z',
   },
   {
-    id: 'mem_halong_04',
-    userId: 'user_anhy_03',
-    userFullName: 'Nguyễn Anh Tuấn',
-    userAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-    title: 'Hoàng hôn buông trên Vịnh Hạ Long kỳ vĩ',
-    description: 'Chèo thuyền kayak qua các hang luồn giữa hàng nghìn đảo đá vôi nhấp nhô. Khi hoàng hôn buông xuống, cả vịnh ngả màu tím vàng diệu kỳ.',
-    photos: [
-      'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1000&q=80',
-    ],
-    location: {
-      name: 'Vịnh Hạ Long, Quảng Ninh',
-      address: 'Thành phố Hạ Long, Quảng Ninh',
-      latitude: 20.910051,
-      longitude: 107.183902,
-    },
-    tags: ['#HaLong', '#DiSan', '#Kayak', '#QuangNinh', '#WonderOfWorld'],
-    taggedUsers: [],
-    privacy: 'public',
-    likesCount: 51,
-    isLiked: false,
-    createdAt: '2026-10-12T17:45:00Z',
-  },
-  {
-    id: 'mem_phuquoc_05',
+    id: 'mem_phuyen_04',
     userId: 'user_admin_01',
     userFullName: 'Hoàng Yến (Admin)',
     userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    title: 'Biển xanh cát trắng Bãi Sao - Đảo Ngọc Phú Quốc',
-    description: 'Nước biển trong vắt như pha lê nhìn thấu tận đáy cát trắng mịn. Thưởng thức gỏi cá trích đặc sản cùng nước dừa ngọt mát bên bờ biển!',
+    title: 'Đón ánh bình minh đầu tiên tại Mũi Điện & Gành Đá Đĩa kỳ quan',
+    description: '4h30 sáng đứng dưới chân ngọn hải đăng Đại Lãnh, tim đập thình thịch khi mặt trời đỏ ối nhô lên từ chân trời biển Đông. Chiều ghé Gành Đá Đĩa ngắm kiệt tác hàng nghìn cột đá bazan đen óng xếp chồng khít khao như tổ ong khổng lồ vươn ra sóng bạc. Bữa tối không thể thiếu thố mắt cá ngừ đại dương tiềm thuốc bắc thơm lừng.',
     photos: [
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=85',
     ],
     location: {
-      name: 'Bãi Sao, TP. Phú Quốc, Kiên Giang',
-      address: 'Ấp Bãi Sao, An Thới, Phú Quốc, Kiên Giang',
-      latitude: 10.053889,
-      longitude: 104.032222,
+      name: 'Gành Đá Đĩa & Mũi Điện, Phú Yên',
+      address: 'Xã An Đông, Huyện Tuy An, Tỉnh Phú Yên',
+      latitude: 13.348611,
+      longitude: 109.300556,
     },
-    tags: ['#PhuQuoc', '#BaiSao', '#BienDao', '#KienGiang', '#CheckinVN'],
+    tags: ['#PhuYen', '#GanhDaDia', '#MuiDien', '#XuHoaVangCoXanh', '#BinhMinh'],
     taggedUsers: [],
-    privacy: 'private', // User's private memory example
-    likesCount: 15,
+    privacy: 'public',
+    likesCount: 62,
+    isLiked: true,
+    createdAt: '2026-10-15T05:30:00Z',
+  },
+  {
+    id: 'mem_cantho_05',
+    userId: 'user_anhy_03',
+    userFullName: 'Tuấn Anh',
+    userAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    title: 'Bình minh sóng sánh chợ nổi Cái Răng & vị ngọt miệt vườn',
+    description: '5h sáng sông Hậu đã rộn rã tiếng máy đuôi tôm và tiếng mời chào của bà con thương hồ miền Tây. Cây bẹo treo gì bán nấy, ghe ghe san sát dập dềnh sóng nước. Ngồi chòng chành ăn tô bún riêu cua đồng nóng hổi và uống ly cà phê sữa đá ngọt béo. Miền Tây hào sảng mà thương nhớ khôn nguôi.',
+    photos: [
+      'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=85',
+    ],
+    location: {
+      name: 'Chợ nổi Cái Răng, Cần Thơ',
+      address: 'Đường Hai Bà Trưng, Quận Cái Răng, TP. Cần Thơ',
+      latitude: 9.999722,
+      longitude: 105.748333,
+    },
+    tags: ['#CanTho', '#ChoNoiCaiRang', '#MienTay', '#SongNuoc', '#BunRieu'],
+    taggedUsers: [],
+    privacy: 'public',
+    likesCount: 44,
     isLiked: false,
-    createdAt: '2026-10-05T11:00:00Z',
+    createdAt: '2026-10-10T06:00:00Z',
+  },
+  {
+    id: 'mem_caobang_06',
+    userId: 'user_admin_01',
+    userFullName: 'Hoàng Yến (Admin)',
+    userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    title: 'Dải lụa biên cương Thác Bản Giốc & suối Lê-nin xanh như ngọc bích',
+    description: 'Ngọn thác tự nhiên lớn nhất Đông Nam Á đổ ầm vang giữa biên giới mây trời, từng tầng nước trắng xóa uốn lượn giữa những triền lúa chín vàng của bà con người Tày. Suối Lê-nin nước trong vắt màu xanh lam ngọc soi bóng núi Các Mác hiên ngang. Tối về thưởng thức đĩa vịt quay 7 vị óng ánh mật ong rừng.',
+    photos: [
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85',
+    ],
+    location: {
+      name: 'Thác Bản Giốc, Cao Bằng',
+      address: 'Đàm Thủy, Trùng Khánh, Cao Bằng',
+      latitude: 22.853914,
+      longitude: 106.723611,
+    },
+    tags: ['#CaoBang', '#ThacBanGioc', '#SuoiLeNin', '#NonNuocCaoBang', '#BienCuong'],
+    taggedUsers: ['demo@memmori.vn'],
+    privacy: 'public',
+    likesCount: 58,
+    isLiked: true,
+    createdAt: '2026-10-06T16:00:00Z',
+  },
+  {
+    id: 'mem_daklak_07',
+    userId: 'user_demo_02',
+    userFullName: 'Emily Demo',
+    userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    title: 'Bản hùng ca Thác Dray Nur & hương Robusta nồng nàn đất đỏ',
+    description: 'Dòng Sêrêpôk cuồn cuộn đổ từ vách đá cao xuống bọt tung trắng xóa như mái tóc bạc của nàng thiếu nữ Ê Đê trong huyền thoại. Ngồi trong căn nhà dài truyền thống lắng nghe tiếng cồng chiêng trầm hùng, nhấp ngụm cà phê Robusta nguyên bản sánh đặc đậm đà, ăn miếng cơm lam nướng ống tre dẻo quánh.',
+    photos: [
+      'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=85',
+    ],
+    location: {
+      name: 'Thác Dray Nur, Đắk Lắk',
+      address: 'Đường nối Krông Ana, Thành phố Buôn Ma Thuột, Đắk Lắk',
+      latitude: 12.536714,
+      longitude: 107.904231,
+    },
+    tags: ['#DakLak', '#DrayNur', '#BuonMaThuot', '#CaPheRobusta', '#CongChieng'],
+    taggedUsers: [],
+    privacy: 'public',
+    likesCount: 37,
+    isLiked: false,
+    createdAt: '2026-10-01T11:15:00Z',
   },
 ];
 
 export const MemoryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, allUsers } = useAuth();
   const [memories, setMemories] = useState<Memory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize and load memories
+  // Initialize and load memories with smart-merge for seed updates
   useEffect(() => {
     const stored = getItem<Memory[]>('memmori_memories_data', []);
     if (stored.length === 0) {
       setMemories(SEED_MEMORIES);
       setItem('memmori_memories_data', SEED_MEMORIES);
     } else {
-      setMemories(stored);
+      // Merge seed memories so newly added editorial stories are available
+      const seedIds = new Set(SEED_MEMORIES.map(s => s.id));
+      const userCustomMemories = stored.filter(m => !seedIds.has(m.id));
+      const merged = [...SEED_MEMORIES, ...userCustomMemories];
+      setMemories(merged);
+      setItem('memmori_memories_data', merged);
     }
     setIsLoading(false);
   }, []);
+
+  // Sync avatar and name across all memories whenever allUsers updates (e.g. avatar changed by user or admin)
+  useEffect(() => {
+    if (allUsers.length > 0 && memories.length > 0) {
+      let changed = false;
+      const updated = memories.map(m => {
+        const matched = allUsers.find(u => u.id === m.userId);
+        if (matched && (matched.avatar !== m.userAvatar || matched.fullName !== m.userFullName)) {
+          changed = true;
+          return {
+            ...m,
+            userAvatar: matched.avatar || m.userAvatar,
+            userFullName: matched.fullName || m.userFullName,
+          };
+        }
+        return m;
+      });
+
+      if (changed) {
+        setMemories(updated);
+        setItem('memmori_memories_data', updated);
+      }
+    }
+  }, [allUsers]);
 
   const saveMemories = (newMemories: Memory[]) => {
     setMemories(newMemories);

@@ -17,6 +17,7 @@ import { useAuth } from '../context/AuthContext';
 import { useMemory } from '../context/MemoryContext';
 import { useApp } from '../context/AppContext';
 import { Memory } from '../types';
+import { getFallbackAvatar, getFallbackPlaceImage, safeImageOnError } from '../utils/imageFallback';
 
 export const FriendsScreen: React.FC<{
   onSelectMemory: (mem: Memory) => void;
@@ -178,7 +179,8 @@ export const FriendsScreen: React.FC<{
                 <div className="p-4 sm:p-5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <img
-                      src={mem.userAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                      src={mem.userAvatar || getFallbackAvatar(mem.userFullName)}
+                      onError={(e) => safeImageOnError(e, getFallbackAvatar(mem.userFullName))}
                       alt={mem.userFullName}
                       onClick={() => onOpenUserProfile && onOpenUserProfile(mem.userId)}
                       className="w-10 h-10 rounded-full object-cover border border-zinc-200 dark:border-zinc-700 cursor-pointer hover:ring-2 hover:ring-violet-500 transition-all"
@@ -206,7 +208,8 @@ export const FriendsScreen: React.FC<{
                 {/* Photos */}
                 {mem.photos && mem.photos.length > 0 && (
                   <img
-                    src={mem.photos[0]}
+                    src={mem.photos[0] || getFallbackPlaceImage(mem.title)}
+                    onError={(e) => safeImageOnError(e, getFallbackPlaceImage(mem.title))}
                     alt={mem.title}
                     className="w-full h-64 sm:h-80 object-cover cursor-pointer hover:opacity-95 transition-opacity"
                     onClick={() => onSelectMemory(mem)}
@@ -280,7 +283,8 @@ export const FriendsScreen: React.FC<{
                   >
                     <div className="relative shrink-0">
                       <img
-                        src={f.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
+                        src={f.avatar || getFallbackAvatar(f.fullName, f.role)}
+                        onError={(e) => safeImageOnError(e, getFallbackAvatar(f.fullName, f.role))}
                         alt={f.fullName}
                         className="w-12 h-12 rounded-full object-cover border border-zinc-200 dark:border-zinc-700 group-hover:border-violet-500 transition-colors"
                       />
@@ -344,7 +348,8 @@ export const FriendsScreen: React.FC<{
                     title={`Xem trang cá nhân của ${u.fullName}`}
                   >
                     <img
-                      src={u.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
+                      src={u.avatar || getFallbackAvatar(u.fullName, u.role)}
+                      onError={(e) => safeImageOnError(e, getFallbackAvatar(u.fullName, u.role))}
                       alt={u.fullName}
                       className="w-11 h-11 rounded-full object-cover border border-zinc-200 dark:border-zinc-700 group-hover:border-violet-500 transition-colors shrink-0"
                     />

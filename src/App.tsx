@@ -19,7 +19,6 @@ import { UserProfileModal } from './components/UserProfileModal';
 import { AdminDashboardModal } from './screens/AdminDashboardModal';
 import { ImageSearchModal } from './components/ImageSearchModal';
 import { Memory, Place } from './types';
-import { Sparkles } from 'lucide-react';
 
 function AppContent() {
   const { 
@@ -41,6 +40,7 @@ function AppContent() {
   const [preselectedPlace, setPreselectedPlace] = useState<Place | undefined>(undefined);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
   const [homeSearchQuery, setHomeSearchQuery] = useState('');
+  const [discoverProvince, setDiscoverProvince] = useState<string | undefined>(undefined);
   const [mapTargetLocation, setMapTargetLocation] = useState<{ latitude: number; longitude: number; name?: string } | null>(null);
 
   const handleOpenCreateWithPlace = (place: Place) => {
@@ -66,6 +66,16 @@ function AppContent() {
     setCurrentTab('map');
   };
 
+  const handleNavigateDiscover = (province?: string) => {
+    setDiscoverProvince(province || 'all');
+    setCurrentTab('discover');
+  };
+
+  const handleViewCommunityPosts = (query: string) => {
+    setHomeSearchQuery(query);
+    setCurrentTab('home');
+  };
+
   const handleSearchHashtag = (tag: string) => {
     setHomeSearchQuery(tag);
     setCurrentTab('home');
@@ -83,6 +93,8 @@ function AppContent() {
             onOpenImageSearch={() => setIsImageSearchOpen(true)}
             onOpenAIChat={() => setIsAiOpen(true)}
             initialSearchQuery={homeSearchQuery}
+            onViewOnMap={handleViewOnMap}
+            onNavigateDiscover={handleNavigateDiscover}
           />
         );
       case 'map':
@@ -91,6 +103,8 @@ function AppContent() {
             onSelectMemory={(mem) => setSelectedMemory(mem)}
             onOpenCreateWithPlace={handleOpenCreateWithPlace}
             targetLocation={mapTargetLocation}
+            onNavigateDiscover={handleNavigateDiscover}
+            onViewCommunityPosts={handleViewCommunityPosts}
           />
         );
       case 'discover':
@@ -100,6 +114,8 @@ function AppContent() {
             onOpenAIChat={() => setIsAiOpen(true)}
             onViewOnMap={handleViewOnMap}
             onOpenImageSearch={() => setIsImageSearchOpen(true)}
+            onViewCommunityPosts={handleViewCommunityPosts}
+            initialProvince={discoverProvince}
           />
         );
       case 'friends':
@@ -166,15 +182,6 @@ function AppContent() {
         onOpenCreate={handleOpenCreate}
       />
 
-      {/* Floating Quick Action Button for AI Chat */}
-      <button
-        onClick={() => setIsAiOpen(true)}
-        className="fixed bottom-20 right-5 z-20 w-12 h-12 rounded-full text-white shadow-xl shadow-purple-500/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all group cursor-pointer"
-        style={{ backgroundColor: accentPreset.primary }}
-        title="Trợ lý AI Du Lịch Memmori (Gemini)"
-      >
-        <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-      </button>
 
       {/* MODALS */}
       {/* 1. Create Memory Modal */}
@@ -194,12 +201,26 @@ function AppContent() {
         onClose={() => setSelectedMemory(null)}
         onOpenUserProfile={(userId) => setViewingUserId(userId)}
         onSearchHashtag={handleSearchHashtag}
+        onViewOnMap={(loc) => {
+          setSelectedMemory(null);
+          handleViewOnMap(loc);
+        }}
+        onNavigateDiscover={(prov) => {
+          setSelectedMemory(null);
+          handleNavigateDiscover(prov);
+        }}
+        onOpenCreateWithPlace={(pl) => {
+          setSelectedMemory(null);
+          handleOpenCreateWithPlace(pl);
+        }}
       />
 
-      {/* 3. AI Gemini Travel Assistant Modal */}
+      {/* 3. Memmori Travel Assistant Modal */}
       <AIChatScreen
         isOpen={isAiOpen}
         onClose={() => setIsAiOpen(false)}
+        onViewOnMap={handleViewOnMap}
+        onOpenCreateWithPlace={handleOpenCreateWithPlace}
       />
 
       {/* 4. AI Image Search Modal */}
@@ -239,6 +260,10 @@ function AppContent() {
         onInspectUser={(userId) => {
           setIsAdminDashboardOpen(false);
           setViewingUserId(userId);
+        }}
+        onSelectMemory={(mem) => {
+          setIsAdminDashboardOpen(false);
+          setSelectedMemory(mem);
         }}
       />
     </div>

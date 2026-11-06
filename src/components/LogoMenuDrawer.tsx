@@ -25,6 +25,7 @@ import { useAuth } from '../context/AuthContext';
 import { TabScreen } from './BottomTabBar';
 import { Language } from '../types';
 import { PrivacyTermsModal } from './PrivacyTermsModal';
+import { getFallbackAvatar, safeImageOnError } from '../utils/imageFallback';
 
 interface LogoMenuDrawerProps {
   isOpen: boolean;
@@ -153,7 +154,8 @@ export const LogoMenuDrawer: React.FC<LogoMenuDrawerProps> = ({
               >
               <div className="flex items-center gap-3">
                 <img
-                  src={user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                  src={user.avatar || getFallbackAvatar(user.fullName, user.role)}
+                  onError={(e) => safeImageOnError(e, getFallbackAvatar(user.fullName, user.role))}
                   alt={user.fullName}
                   className="w-11 h-11 rounded-full object-cover border-2 border-violet-500/50 shadow-sm"
                 />
@@ -217,18 +219,18 @@ export const LogoMenuDrawer: React.FC<LogoMenuDrawerProps> = ({
           <div className="p-3.5 rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-fuchsia-500/5 to-transparent dark:from-violet-950/40 dark:via-zinc-900 dark:to-zinc-900">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-black uppercase tracking-wider text-violet-600 dark:text-violet-400 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
-                Bộ tiện ích điều khiển (Ảnh 8E)
+                <Compass className="w-3.5 h-3.5" />
+                Bộ tiện ích du lịch & điều khiển
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/60 text-violet-700 dark:text-violet-300 font-bold">
-                Tích hợp
+                Memmori
               </span>
             </div>
 
-            {/* 1. Nút Trợ lý AI Gemini (Photo 8E Feature 1) */}
+            {/* 1. Nút Trợ lý Memmori */}
             <button
               onClick={handleOpenAIModal}
-              className="w-full flex items-center justify-between p-2.5 mb-2.5 rounded-xl text-white font-bold text-xs shadow-md transition-all hover:opacity-95 active:scale-98"
+              className="w-full flex items-center justify-between p-2.5 mb-2.5 rounded-xl text-white font-bold text-xs shadow-md transition-all hover:opacity-95 active:scale-98 cursor-pointer"
               style={{
                 background: `linear-gradient(135deg, ${accentPreset.primary}, #ec4899)`
               }}
@@ -238,8 +240,8 @@ export const LogoMenuDrawer: React.FC<LogoMenuDrawerProps> = ({
                   <Sparkles className="w-4 h-4 animate-spin text-white" style={{ animationDuration: '4s' }} />
                 </div>
                 <div className="text-left">
-                  <div className="text-xs font-bold">Trợ lý AI Gemini</div>
-                  <div className="text-[10px] text-white/80 font-normal">Gợi ý lịch trình & caption du lịch</div>
+                  <div className="text-xs font-bold">Trợ lý Memmori</div>
+                  <div className="text-[10px] text-white/80 font-normal">Gợi ý lịch trình & ẩm thực du lịch</div>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-white/70" />
@@ -441,7 +443,7 @@ export const LogoMenuDrawer: React.FC<LogoMenuDrawerProps> = ({
                       Chính sách & Tiêu chuẩn Store
                     </div>
                     <div className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                      Bảo mật GPS, ảnh & điều khoản CH Play / App Store
+                      Quyền riêng tư vị trí & điều khoản dịch vụ
                     </div>
                   </div>
                 </div>

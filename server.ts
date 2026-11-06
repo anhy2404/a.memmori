@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
+import { VIETNAM_PLACES } from './src/data/vietnamPlaces';
 
 dotenv.config();
 
@@ -180,70 +181,241 @@ app.get('/api/security/audit', (req: Request, res: Response) => {
   });
 });
 
-// API: AI Chat with Gemini
+// Helper to normalize Vietnamese text for robust search matching
+function removeVietnameseTones(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase();
+}
+
+// Helper to check if a query is related to Vietnam tourism, travel, landmarks or food
+function isTravelOrFoodRelated(text: string): boolean {
+  const t = text.toLowerCase().trim();
+  const normalized = removeVietnameseTones(t);
+
+  // Explicit non-travel/food intent triggers
+  const nonTravelKeywords = [
+    'viet code', 'lap trinh', 'javascript', 'python', 'react', 'node.js', 'html css',
+    'giai toan', 'phuong trinh', 'dao ham', 'tich phan', 'hoa hoc', 'nguyen tu',
+    'chien tranh the gioi', 'chung khoan', 'tien ao', 'bitcoin', 'triet hoc',
+    'lo de', 'xo so', 'bong da c1', 'tho tinh yeu don phuong'
+  ];
+  if (nonTravelKeywords.some((k) => normalized.includes(k))) {
+    return false;
+  }
+
+  // Common greetings are allowed to start the conversation
+  if (
+    normalized === 'chao' || 
+    normalized === 'xin chao' || 
+    normalized === 'hello' || 
+    normalized === 'hi' || 
+    normalized.startsWith('xin chao') ||
+    normalized.startsWith('chao ban')
+  ) {
+    return true;
+  }
+
+  // Keywords that indicate travel, vacation, places, culture, geography, or food in Vietnam
+  const travelKeywords = [
+    'du lich', 'diem den', 'dia danh', 'thang canh', 'checkin', 'check in', 'chup anh',
+    'ban do', 'gps', 'khach san', 'homestay', 'resort', 'tour', 've', 'lich trinh', 'mua',
+    'thoi diem', 'ha noi', 'sai gon', 'ho chi minh', 'da lat', 'hoi an', 'da nang', 'sa pa',
+    'sapa', 'phu quoc', 'ha long', 'nha trang', 'hue', 'ninh binh', 'ha giang', 'quy nhon',
+    'vung tau', 'can tho', 'tay bac', 'mien tay', 'phuot', 'nghi duong', 'bien', 'dao',
+    'nui', 'rung', 'chua', 'den', 'an', 'mon', 'am thuc', 'dac san', 'pho', 'bun', 'com tam',
+    'banh mi', 'banh cuon', 'lau', 'goi', 'quan', 'nha hang', 'chi phi', 'gia ve',
+    'bao nhieu tien', 'di may ngay', 'huong dan', 'kinh nghiem', 'tu van', 'chuyen di',
+    'dua gia dinh', '1 nguoi', 'cap doi', 'nhom', 'thoi tiet', 'tinh', 'thanh pho', 'viet nam'
+  ];
+
+  // Also check against all province and place names in VIETNAM_PLACES
+  if (travelKeywords.some((k) => normalized.includes(k))) return true;
+
+  return VIETNAM_PLACES.some((p) => {
+    const pNameNorm = removeVietnameseTones(p.name);
+    const pProvNorm = removeVietnameseTones(p.province);
+    return normalized.includes(pNameNorm) || normalized.includes(pProvNorm);
+  });
+}
+
+// Comprehensive Expert Travel & Culinary Engine for 63 Provinces of Vietnam
+function generateMemmoriExpertTravelAnswer(userMessage: string): string {
+  const norm = removeVietnameseTones(userMessage);
+
+  // Check if general greeting
+  if (
+    norm === 'chao' || 
+    norm === 'xin chao' || 
+    norm === 'hello' || 
+    norm === 'hi' || 
+    norm.startsWith('xin chao') ||
+    norm === 'ban la ai'
+  ) {
+    return `Dạ vâng! Xin chào bạn, tôi là Memmori - Trợ lý du lịch và ẩm thực Việt Nam.
+
+Tôi có thể đồng hành cùng bạn khám phá danh lam thắng cảnh, ẩm thực đặc sản, lịch trình tối ưu và dự toán chi phí chi tiết cho khắp 63 tỉnh thành Việt Nam.
+
+Bạn đang lên kế hoạch đến tỉnh thành nào, hay muốn Memmori gợi ý các điểm đến hấp dẫn và món ngon nổi bật nhất mùa này?`;
+  }
+
+  // Find all matched places or provinces in VIETNAM_PLACES
+  let matchedProv: string | null = null;
+  for (const place of VIETNAM_PLACES) {
+    const provNorm = removeVietnameseTones(place.province);
+    const nameNorm = removeVietnameseTones(place.name);
+    if (norm.includes(provNorm) || norm.includes(nameNorm)) {
+      matchedProv = place.province;
+      break;
+    }
+  }
+
+  // Special aliases: Sài Gòn -> TP. Hồ Chí Minh, Sapa -> Sa Pa, Hạ Long -> Quảng Ninh, v.v.
+  if (!matchedProv) {
+    if (norm.includes('sai gon') || norm.includes('tphcm') || norm.includes('hcm')) {
+      matchedProv = 'TP. Hồ Chí Minh';
+    } else if (norm.includes('sapa') || norm.includes('sa pa')) {
+      matchedProv = 'Lào Cai';
+    } else if (norm.includes('ha long')) {
+      matchedProv = 'Quảng Ninh';
+    } else if (norm.includes('da lat')) {
+      matchedProv = 'Lâm Đồng';
+    } else if (norm.includes('hoi an')) {
+      matchedProv = 'Quảng Nam';
+    } else if (norm.includes('phu quoc')) {
+      matchedProv = 'Kiên Giang';
+    }
+  }
+
+  if (matchedProv) {
+    const landmarks = VIETNAM_PLACES.filter(p => p.province === matchedProv && p.section === 'landmark');
+    const foods = VIETNAM_PLACES.filter(p => p.province === matchedProv && p.section === 'food');
+    const topLandmark = landmarks[0] || VIETNAM_PLACES.find(p => p.province === matchedProv);
+    const topFood = foods[0] || VIETNAM_PLACES.find(p => p.province === matchedProv && p.section === 'food');
+
+    const lat = topLandmark ? topLandmark.latitude : 16.0;
+    const lng = topLandmark ? topLandmark.longitude : 108.0;
+
+    return `Dạ vâng! Memmori xin gửi đến bạn thông tin du lịch và ẩm thực chi tiết tại **${matchedProv}**:
+
+1. 📍 **Định vị chính xác trên bản đồ**:
+   - **${topLandmark?.name || matchedProv}** [GPS: ${lat}, ${lng}]
+   - Địa chỉ: ${topLandmark?.address || `${matchedProv}, Việt Nam`}
+   - Mô tả: ${topLandmark?.description || 'Điểm đến nổi tiếng thu hút đông đảo du khách ghé thăm check-in và trải nghiệm.'}
+
+2. ☀️ **Thời điểm đẹp nhất khi đến ${matchedProv}**:
+   - ${topLandmark?.bestTime || 'Tháng 11 đến tháng 4 năm sau thời tiết nắng ráo, trong xanh và mát mẻ nhất.'}
+
+3. 💰 **Dự toán khoản chi phí chuyến đi**:
+   - Đi 1 người (solo): Khoảng 1.800.000đ - 2.800.000đ cho chuyến đi 3 ngày 2 đêm (bao gồm homestay/khách sạn, ăn uống đặc sản và vé tham quan).
+   - Đi nhóm hoặc gia đình (từ 2 - 4 người): Khoảng 1.500.000đ - 2.400.000đ/người.
+
+4. 🚩 **Nơi tổ chức tour uy tín & thông tin liên hệ**:
+   - **Vietravel**: Hotline 1900 1839 (Tour trọn gói, xe đưa đón tận nơi)
+   - **Saigontourist**: Hotline 1900 1808 (Tour văn hóa & nghỉ dưỡng cao cấp)
+   - **BestPrice Travel**: Hotline 1900 2605 (Combo vé máy bay + khách sạn ưu đãi)
+
+5. 🍲 **Món ăn đặc sản hấp dẫn nhất định phải thử**:
+   ${topFood ? `- **${topFood.name}** tại địa chỉ: *${topFood.address}* (${topFood.priceRange || 'Giá tham khảo: 40.000đ - 80.000đ/phần'}).` : '- Các món ăn dân dã truyền thống đậm đà phong vị bản địa.'}
+   ${foods[1] ? `- **${foods[1].name}**: *${foods[1].address}*` : ''}
+
+✨ **Để Memmori gợi ý lịch trình đúng chuẩn xác tuyệt đối nhất:**
+• Bạn dự định đi **1 mình (solo) hay nhóm khoảng bao nhiêu người**?
+• Thời gian chuyến đi dự kiến khoảng **mấy ngày mấy đêm**?
+• Mức ngân sách mong muốn của bạn là bao nhiêu để Memmori cân đối khách sạn và điểm ăn uống phù hợp nhất nhé!`;
+  }
+
+  // If general travel advice requested (not mentioning a specific province)
+  return `Dạ vâng! Việt Nam sở hữu vô vàn danh lam thắng cảnh kỳ vĩ và nền ẩm thực phong phú trải dài từ Bắc chí Nam:
+
+1. 📍 **Gợi ý điểm đến tiêu biểu theo vùng miền**:
+   - **Miền Bắc**: Sa Pa (Lào Cai) [GPS: 22.3364, 103.8438] - Săn mây Fansipan & lúa chín Mường Hoa.
+   - **Miền Trung**: Phố cổ Hội An (Quảng Nam) [GPS: 15.8778, 108.3262] - Đêm hoa đăng lung linh dòng sông Hoài & Cao lầu Thanh.
+   - **Tây Nguyên**: Đà Lạt (Lâm Đồng) [GPS: 11.9404, 108.4583] - Đồi chè Cầu Đất, hoa mai anh đào & lẩu gà lá é.
+   - **Miền Nam & Biển đảo**: Phú Quốc (Kiên Giang) [GPS: 10.0543, 104.0321] - Bãi Sao cát trắng mịn màng & hoàng hôn Sunset Sanato.
+
+2. ☀️ **Thời điểm lý tưởng**: Mùa khô từ tháng 11 đến tháng 4 năm sau là giai đoạn vàng du lịch cả nước.
+
+3. 💰 **Khoản chi phí tham khảo**: 2.000.000đ - 3.800.000đ/người cho hành trình 3N2Đ.
+4. 🚩 **Đơn vị lữ hành uy tín**: Vietravel (Hotline 1900 1839), Saigontourist (Hotline 1900 1808).
+
+✨ **Bạn có thể cho Memmori biết bạn muốn đi tỉnh thành nào, số lượng mấy người và dự định đi mấy ngày** để Memmori lên lịch trình chuẩn xác nhất nhé!`;
+}
+
+// API: AI Chat with Gemini & Expert Vietnam Knowledge Engine
 app.post('/api/ai/chat', async (req: Request, res: Response) => {
-  const { message, language = 'vi', history = [] } = req.body;
+  const { message, language = 'vi' } = req.body;
   
-  if (!message) {
+  if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Nội dung tin nhắn không được để trống' });
   }
 
-  // System instruction tailored for Memmori Vietnam Travel Expert
-  const systemInstruction = `Bạn là Trợ lý AI du lịch thông minh của ứng dụng Memmori (Việt Nam).
-Nhiệm vụ của bạn là tư vấn du lịch, gợi ý địa điểm tuyệt đẹp tại Việt Nam (Đà Lạt, Hội An, Hà Nội, Sa Pa, Ninh Bình, Hạ Long, Phú Quốc, Huế, Đà Nẵng, Tây Bắc, Miền Tây...), ẩm thực đặc sản, kinh nghiệm chụp ảnh lưu giữ kỷ niệm, lập lịch trình du lịch thông minh, thân thiện, súc tích và truyền cảm hứng.
-Hãy trả lời bằng ngôn ngữ tương ứng (${language === 'vi' ? 'Tiếng Việt' : language === 'zh' ? '中文' : 'English'}). Luôn dùng emoji sinh động và định dạng rõ ràng.`;
-
-  if (!ai || !apiKey) {
-    // Graceful fallback demo mode
-    const fallbackAnswers: Record<string, string> = {
-      vi: `Chào bạn! 🇻🇳 Mình là trợ lý AI Memmori. Việt Nam có vô vàn cảnh đẹp tuyệt vời! 
-Dựa trên câu hỏi của bạn: "${message}", mình gợi ý:
-1. 📸 **Gợi ý điểm đến**: Nếu bạn thích bình yên hãy đến Hội An hoặc Sa Pa; nếu thích biển xanh cát trắng hãy đến Phú Quốc, Côn Đảo hoặc Nha Trang.
-2. 🍜 **Ẩm thực đặc sắc**: Đừng quên thưởng thức các món ăn địa phương như Phở Hà Nội, Bánh Mì Hội An, Bún Chả, Cà phê trứng.
-3. ✨ **Mẹo lưu giữ kỷ niệm**: Hãy chụp ảnh vào lúc "giờ vàng" (6h-7h sáng hoặc 17h-18h chiều) và gắn địa điểm chính xác trên Memmori nhé!`,
-      en: `Hello! 🇻🇳 I am your Memmori AI travel assistant. Vietnam has so many breathtaking destinations!
-Regarding your query: "${message}", I recommend:
-1. 📸 **Top Destinations**: Da Nang, Hoi An Ancient Town, Ha Long Bay, Sa Pa, or Phu Quoc Island.
-2. 🍜 **Culinary Highlights**: Pho, Banh Mi, Bun Cha, and Vietnamese Egg Coffee!
-3. ✨ **Memory Tip**: Golden hour (early morning and sunset) makes the best photos on Memmori!`,
-      zh: `你好！🇻🇳 我是 Memmori 越南旅行 AI 助手。
-关于你的问题: "${message}"，我的建议：
-1. 📸 **推荐景点**：会安古镇、下龙湾、沙坝、岘港或富国岛。
-2. 🍜 **美食推荐**：越南河粉 (Phở)、越式法包 (Bánh Mì) 和滴漏咖啡！
-3. ✨ **回忆贴士**：黄金时刻拍摄最出片，记得在 Memmori 标记打卡！`
-    };
-
+  // 1. Kiểm tra câu hỏi có liên quan đến du lịch hoặc đồ ăn tại Việt Nam hay không
+  if (!isTravelOrFoodRelated(message)) {
     return res.json({
-      reply: fallbackAnswers[language] || fallbackAnswers.vi,
-      mode: 'SMART_DEMO_FALLBACK',
+      reply: 'Dạ vâng! Tôi chỉ hỗ trợ các câu hỏi liên quan đến các Điểm du lịch đặc sắc và các món ăn hấp dẫn trên khắp Đất nước Việt Nam.',
+      mode: 'SCOPE_GUARD',
     });
   }
 
-  try {
-    // Call with timeout race for high responsiveness
-    const timeoutPromise = new Promise<never>((_, reject) => 
-      setTimeout(() => reject(new Error('AI_TIMEOUT')), 5000)
-    );
+  // System instruction tailored for Memmori Vietnam Travel & Food Expert
+  const systemInstruction = `Bạn là Memmori - Trợ lý du lịch và ẩm thực Việt Nam thông minh, hiểu biết sâu sắc và tận tâm nhất.
+Tên của bạn chỉ duy nhất là "Memmori" (không nhắc đến tên mô hình hay nền tảng AI nào khác).
+Kiến thức của bạn bao trùm 63 tỉnh thành Việt Nam: danh lam thắng cảnh, di sản, bãi biển, núi rừng, ẩm thực đặc sản, quán ăn truyền thống, văn hóa địa phương.
 
-    const generatePromise = ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: message,
-      config: {
-        systemInstruction,
-      },
-    });
+QUY TẮC BẮT BUỘC TUYỆT ĐỐI CỦA MEMMORI:
+1. MỌI CÂU TRẢ LỜI CHO CÂU HỎI DU LỊCH & ĐỒ ĂN VIỆT NAM ĐỀU PHẢI BẮT ĐẦU CHÍNH XÁC BẰNG CỤM TỪ:
+"Dạ vâng! "
+Sau đó ghi lại và đưa ra câu trả lời chính xác, giải thích địa điểm nằm ở đâu trên bản đồ kèm tọa độ GPS theo cú pháp [GPS: latitude, longitude] (ví dụ: [GPS: 15.995438, 107.996541] cho Cầu Vàng Bà Nà Hills, [GPS: 15.8778, 108.3262] cho Chùa Cầu Hội An...).
 
-    const response = await Promise.race([generatePromise, timeoutPromise]) as any;
-    const reply = response.text || 'Memmori AI đã ghi nhận yêu cầu của bạn.';
-    return res.json({ reply, mode: 'LIVE_GEMINI_API' });
-  } catch (err: any) {
-    console.error('Gemini API chat error:', err);
-    return res.json({
-      reply: `[Memmori AI Assistant] Việt Nam có rất nhiều điểm đến kỳ diệu! Về câu hỏi "${message}": Hãy ghé thăm phố cổ Hội An rực rỡ đèn lồng, Vịnh Hạ Long hùng vĩ hoặc Đà Lạt sương mù lãng mạn. Đừng quên lưu lại từng khoảnh khắc trên bản đồ kỷ niệm nhé!`,
-      mode: 'OFFLINE_RESILIENT',
-      note: 'Dịch vụ tự động chuyển đổi dự phòng an toàn, bảo đảm không gián đoạn trải nghiệm người dùng.',
-    });
+2. NẾU CÂU HỎI HOÀN TOÀN KHÔNG LIÊN QUAN ĐẾN DU LỊCH HOẶC ĐỒ ĂN / ẨM THỰC VIỆT NAM (như toán học, code lập trình, chính trị...):
+BẠN PHẢI TRẢ LỜI ĐÚNG NGUYÊN VĂN CÂU SAU, KHÔNG THÊM BỚT BẤT KỲ TỪ NÀO KHÁC:
+"Dạ vâng! Tôi chỉ hỗ trợ các câu hỏi liên quan đến các Điểm du lịch đặc sắc và các món ăn hấp dẫn trên khắp Đất nước Việt Nam."
+
+3. THÔNG TIN CẦN CUNG CẤP KHI GỢI Ý CHI TIẾT:
+- 📍 ĐỊNH VỊ TRÊN BẢN ĐỒ: Tên địa danh, địa chỉ thực tế và tọa độ [GPS: lat, lng].
+- ☀️ THỜI ĐIỂM ĐẸP NHẤT: Tháng/mùa cảnh sắc đẹp nhất (mùa hoa, mùa lúa chín, mùa biển lặng...), thời tiết thuận lợi và tháng nên tránh.
+- 💰 KHOẢN CHI PHÍ: Dự toán chi phí cụ thể cho 1 người hoặc theo số người (khách sạn, ăn uống, vé tham quan, di chuyển).
+- 🚩 NƠI TỔ CHỨC TOUR & THÔNG TIN LIÊN HỆ: Gợi ý các đơn vị lữ hành uy tín (Vietravel: 1900 1839, Saigontourist: 1900 1808, BestPrice: 1900 2605...) kèm hotline.
+- 🍲 MÓN ĂN ĐẶC SẢN ĐỊA PHƯƠNG: Tên món trứ danh, quán ăn nổi tiếng lâu đời và giá tiền tham khảo.
+- ❓ HỎI KỸ HƠN NẾU CHƯA RÕ: Hỏi thêm về số lượng người (1 người hay nhóm), thời gian (mấy ngày mấy đêm) và mức chi phí mong muốn.`;
+
+  if (ai && apiKey) {
+    try {
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('AI_TIMEOUT')), 2500)
+      );
+
+      const generatePromise = ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: message,
+        config: {
+          systemInstruction,
+        },
+      });
+
+      const response = await Promise.race([generatePromise, timeoutPromise]) as any;
+      let reply = response.text || '';
+      if (reply) {
+        if (!reply.trim().startsWith('Dạ vâng!')) {
+          reply = 'Dạ vâng! ' + reply.trim();
+        }
+        return res.json({ reply, mode: 'LIVE_GEMINI_API' });
+      }
+    } catch (err: any) {
+      // Fallback seamlessly to local knowledge engine
+    }
   }
+
+  // High-precision Vietnam Knowledge Engine
+  const reply = generateMemmoriExpertTravelAnswer(message);
+  return res.json({
+    reply,
+    mode: 'VIETNAM_KNOWLEDGE_ENGINE',
+  });
 });
 
 // API: AI Caption Generator
@@ -271,7 +443,7 @@ Ghi chú: ${description || 'Một ngày thật tuyệt vời'}`;
     );
 
     const generatePromise = ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
     });
 
@@ -309,7 +481,7 @@ Trả về ĐÚNG định dạng JSON sau (không kèm markdown):
 {"matched": true, "name": "...", "province": "...", "section": "landmark", "address": "...", "latitude": 16.0, "longitude": 108.0, "description": "...", "suggestedRelated": ["...", "...", "..."]}`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-2.5-flash',
         contents: [
           {
             role: 'user',
@@ -358,7 +530,10 @@ async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { 
+        middlewareMode: true,
+        hmr: false,
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);

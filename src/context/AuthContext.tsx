@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User, UserRole, AccountStatus } from '../types';
 import { getItem, setItem, removeItem } from '../utils/storage';
 import { hashPassword, verifyPassword, checkRateLimit, generateSecureToken } from '../utils/security';
+import { getFallbackAvatar } from '../utils/imageFallback';
 
 interface AuthContextType {
   user: User | null;
@@ -208,7 +209,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       fullName: data.fullName.trim(),
       role: 'user',
       phoneNumber: data.phoneNumber?.trim() || '',
-      avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(data.fullName)}`,
+      avatar: getFallbackAvatar(data.fullName.trim(), 'user'),
       bio: 'Người yêu du lịch Việt Nam 🇻🇳',
       isVerified: false,
       createdAt: new Date().toISOString(),

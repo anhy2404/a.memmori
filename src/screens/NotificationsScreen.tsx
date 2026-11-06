@@ -19,6 +19,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { useMemory } from '../context/MemoryContext';
 import { Memory } from '../types';
+import { getFallbackAvatar, safeImageOnError } from '../utils/imageFallback';
 
 export interface NotificationItem {
   id: string;
@@ -440,7 +441,8 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
                             title={`Xem trang cá nhân của ${item.senderName}`}
                           >
                             <img
-                              src={item.senderAvatar}
+                              src={item.senderAvatar || getFallbackAvatar(item.senderName)}
+                              onError={(e) => safeImageOnError(e, getFallbackAvatar(item.senderName))}
                               alt={item.senderName}
                               className={`w-11 h-11 rounded-full object-cover border-2 transition-colors ${
                                 isUnread ? 'border-violet-600' : 'border-zinc-200 dark:border-zinc-700'

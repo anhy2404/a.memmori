@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { 
   X, 
   MapPin, 
-  Sparkles, 
+  Compass, 
   Upload, 
   Image as ImageIcon, 
   Lock, 
@@ -311,7 +311,7 @@ export const CreateMemoryModal: React.FC<CreateMemoryModalProps> = ({
                   Tạo Kỷ Niệm Mới
                 </h2>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Lưu giữ khoảnh khắc với ảnh đẹp, định vị GPS chính xác và AI Caption
+                  Lưu giữ khoảnh khắc với ảnh đẹp, định vị GPS chính xác và gợi ý lời tựa cảm xúc
                 </p>
               </div>
             </div>
@@ -482,11 +482,11 @@ export const CreateMemoryModal: React.FC<CreateMemoryModalProps> = ({
                   type="button"
                   onClick={handleGenerateAiCaption}
                   disabled={isGeneratingAi}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-90 transition-all disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
                   style={{ backgroundColor: accentPreset.primary }}
                 >
-                  <Sparkles className={`w-3.5 h-3.5 ${isGeneratingAi ? 'animate-spin' : ''}`} />
-                  <span>{isGeneratingAi ? 'Gemini đang nghĩ...' : 'AI Gemini Gợi Ý Caption'}</span>
+                  <Compass className={`w-3.5 h-3.5 ${isGeneratingAi ? 'animate-spin' : ''}`} />
+                  <span>{isGeneratingAi ? 'Đang viết lời tựa...' : 'Gợi ý lời tựa cảm xúc'}</span>
                 </button>
               </div>
 

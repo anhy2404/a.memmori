@@ -27,6 +27,7 @@ import { Memory } from '../types';
 import { PrivacyTermsModal } from '../components/PrivacyTermsModal';
 import { CameraCaptureModal } from '../components/CameraCaptureModal';
 import { DeleteAccountConfirmModal } from '../components/DeleteAccountConfirmModal';
+import { getFallbackAvatar, getFallbackPlaceImage, safeImageOnError } from '../utils/imageFallback';
 
 export const ProfileScreen: React.FC<{
   onOpenSettings: () => void;
@@ -152,7 +153,8 @@ export const ProfileScreen: React.FC<{
           {/* Avatar */}
           <div className="relative group shrink-0">
             <img
-              src={user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+              src={user.avatar || getFallbackAvatar(user.fullName, user.role)}
+              onError={(e) => safeImageOnError(e, getFallbackAvatar(user.fullName, user.role))}
               alt={user.fullName}
               className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-violet-500/20 shadow-md"
             />
@@ -202,23 +204,11 @@ export const ProfileScreen: React.FC<{
             )}
           </div>
 
-          {/* Quick Actions */}
+          {/* Quick Actions (Bỏ nút quản lý trên theo yêu cầu ảnh C6C9, chừa lại nút quản lý bên dưới) */}
           <div className="flex sm:flex-col gap-2 shrink-0">
-            {(user.role === 'admin' || user.role === 'admin_f2') && onOpenAdminDashboard && (
-              <button
-                onClick={onOpenAdminDashboard}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer hover:opacity-95"
-                style={{ backgroundColor: accentPreset.primary }}
-                title="Quản lý"
-              >
-                <Users className="w-3.5 h-3.5" />
-                <span>Quản lý</span>
-              </button>
-            )}
-
             <button
               onClick={handleOpenEdit}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition-colors flex items-center justify-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Sửa hồ sơ</span>
@@ -226,20 +216,21 @@ export const ProfileScreen: React.FC<{
 
             <button
               onClick={onOpenSettings}
-              className="p-2 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition-colors flex items-center justify-center gap-1.5"
+              className="p-2 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               title="Cài đặt"
             >
               <SettingsIcon className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Cài đặt</span>
             </button>
 
+            {/* Nút Đăng Xuất: Chỉ để lại ký tự biểu tượng, không để chữ theo yêu cầu */}
             <button
               onClick={logout}
-              className="p-2 rounded-xl text-xs font-bold bg-red-50 dark:bg-red-950/40 text-red-600 hover:bg-red-100 transition-colors flex items-center justify-center gap-1.5"
-              title="Đăng xuất"
+              className="p-2 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50 transition-colors flex items-center justify-center cursor-pointer shadow-xs"
+              title="Đăng xuất tài khoản"
+              aria-label="Đăng xuất"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Thoát</span>
+              <LogOut className="w-4 h-4 text-rose-500" />
             </button>
           </div>
 
@@ -342,7 +333,8 @@ export const ProfileScreen: React.FC<{
               className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer bg-zinc-100 dark:bg-zinc-800 shadow-xs"
             >
               <img
-                src={mem.photos[0] || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80'}
+                src={mem.photos[0] || getFallbackPlaceImage(mem.title)}
+                onError={(e) => safeImageOnError(e, getFallbackPlaceImage(mem.title))}
                 alt={mem.title}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
@@ -365,7 +357,8 @@ export const ProfileScreen: React.FC<{
               className="p-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-3.5 cursor-pointer hover:border-violet-500/50 transition-all shadow-xs"
             >
               <img
-                src={mem.photos[0] || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=400&q=80'}
+                src={mem.photos[0] || getFallbackPlaceImage(mem.title)}
+                onError={(e) => safeImageOnError(e, getFallbackPlaceImage(mem.title))}
                 alt={mem.title}
                 className="w-16 h-16 rounded-xl object-cover shrink-0"
               />
@@ -460,7 +453,8 @@ export const ProfileScreen: React.FC<{
                   title="Nhấn để chọn ảnh mới từ máy"
                 >
                   <img
-                    src={editAvatar || user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                    src={editAvatar || user.avatar || getFallbackAvatar(user.fullName, user.role)}
+                    onError={(e) => safeImageOnError(e, getFallbackAvatar(user.fullName, user.role))}
                     alt="Avatar"
                     className="w-20 h-20 rounded-full object-cover border-4 border-violet-500/30 shadow-md group-hover:opacity-90 transition-opacity"
                   />

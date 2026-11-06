@@ -50,16 +50,6 @@ export const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({
     setErrorMsg(null);
 
     try {
-      // Check if camera is restricted by parent document permissions policy
-      const doc = typeof document !== 'undefined' ? (document as any) : null;
-      if (doc?.permissionsPolicy && typeof doc.permissionsPolicy.allowsFeature === 'function') {
-        if (!doc.permissionsPolicy.allowsFeature('camera')) {
-          setErrorMsg('Máy ảnh trực tiếp bị giới hạn trong khung nhúng trình duyệt. Vui lòng chọn ảnh từ thiết bị của bạn bên dưới.');
-          setIsStarting(false);
-          return;
-        }
-      }
-
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('Trình duyệt không hỗ trợ truy cập máy ảnh trực tiếp');
       }
